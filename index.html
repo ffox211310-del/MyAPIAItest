@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIチャット - APIキーで起動</title>
+    <title>AI Chat - Powered by OpenRouter</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +22,7 @@
         }
         .container {
             width: 100%;
-            max-width: 720px;
+            max-width: 750px;
             background: #1e293b;
             border-radius: 1.5rem;
             padding: 2rem;
@@ -30,9 +30,9 @@
         }
         h1 {
             text-align: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             font-size: 2rem;
-            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            background: linear-gradient(135deg, #f97316, #f43f5e);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -69,7 +69,7 @@
             margin: 0.25rem 0.5rem 0.25rem 0;
             padding: 0.5rem 1rem;
             background: #334155;
-            color: #38bdf8;
+            color: #f97316;
             text-decoration: none;
             border-radius: 0.5rem;
             font-weight: 500;
@@ -77,6 +77,29 @@
         }
         .api-links a:hover {
             background: #475569;
+        }
+        .model-selector {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .model-selector label {
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .model-selector select {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1rem;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            color: #e2e8f0;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
         }
         .key-input-group {
             display: flex;
@@ -96,11 +119,11 @@
             transition: border 0.2s;
         }
         .key-input-group input:focus {
-            border-color: #38bdf8;
+            border-color: #f97316;
         }
         .btn {
             padding: 0.75rem 1.5rem;
-            background: #3b82f6;
+            background: #f97316;
             color: white;
             border: none;
             border-radius: 0.75rem;
@@ -113,7 +136,7 @@
             gap: 0.5rem;
         }
         .btn:hover {
-            background: #2563eb;
+            background: #ea580c;
         }
         .btn:active {
             transform: scale(0.98);
@@ -129,8 +152,8 @@
         .chat-panel {
             display: none;
             flex-direction: column;
-            height: 60vh;
-            min-height: 400px;
+            height: 65vh;
+            min-height: 420px;
         }
         .chat-panel.active {
             display: flex;
@@ -159,7 +182,7 @@
         }
         .message.user {
             align-self: flex-end;
-            background: #3b82f6;
+            background: #f97316;
             color: white;
             border-bottom-right-radius: 0.25rem;
         }
@@ -178,9 +201,11 @@
         .chat-input-area {
             display: flex;
             gap: 0.75rem;
+            flex-wrap: wrap;
         }
         .chat-input-area input {
             flex: 1;
+            min-width: 180px;
             padding: 0.75rem 1rem;
             background: #0f172a;
             border: 1px solid #334155;
@@ -190,7 +215,7 @@
             outline: none;
         }
         .chat-input-area input:focus {
-            border-color: #38bdf8;
+            border-color: #f97316;
         }
         .status {
             font-size: 0.85rem;
@@ -203,29 +228,51 @@
         }
         @media (max-width: 480px) {
             .container { padding: 1.5rem; }
-            .key-input-group { flex-direction: column; }
+            .key-input-group, .model-selector, .chat-input-area { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🤖 AIチャット</h1>
-        <p class="subtitle">自分のAPIキーでAIを起動しよう</p>
+        <h1>🧠 OpenRouter Chat</h1>
+        <p class="subtitle">1つのキーで複数AIを自由に使おう</p>
 
-        <!-- セットアップエリア -->
+        <!-- セットアップパネル -->
         <div id="setupPanel" class="setup-panel">
             <h2>🔑 APIキーを取得する</h2>
             <div class="api-links">
-                <p>以下のサービスでAPIキーを発行できます（OpenAI推奨）</p>
-                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">
-                    OpenAI API Keys ↗
+                <p>OpenRouter でAPIキーを発行します（無料枠あり）</p>
+                <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">
+                    OpenRouter Keys ページ ↗
                 </a>
-                <a href="https://platform.openai.com/signup" target="_blank" rel="noopener">
-                    アカウント作成 ↗
+                <a href="https://openrouter.ai/docs" target="_blank" rel="noopener">
+                    ドキュメント ↗
                 </a>
             </div>
+
+            <div class="model-selector">
+                <label for="modelSelect">🧩 使用モデル:</label>
+                <select id="modelSelect">
+                    <option value="meta-llama/llama-3.2-3b-instruct:free" selected>
+                        🆓 Llama 3.2 3B (無料)
+                    </option>
+                    <option value="google/gemini-2.0-flash-001">
+                        ⚡ Gemini 2.0 Flash
+                    </option>
+                    <option value="openai/gpt-3.5-turbo">
+                        💬 GPT-3.5 Turbo
+                    </option>
+                    <option value="anthropic/claude-3-haiku">
+                        🎯 Claude 3 Haiku
+                    </option>
+                    <option value="mistralai/mistral-7b-instruct">
+                        🌪️ Mistral 7B
+                    </option>
+                </select>
+            </div>
+
             <div class="key-input-group">
-                <input type="password" id="apiKeyInput" placeholder="sk-... あなたのAPIキーを貼り付け">
+                <input type="password" id="apiKeyInput" placeholder="sk-or-v1-... キーを貼り付け">
                 <button class="btn" id="activateBtn">
                     <span>⚡</span> 起動する
                 </button>
@@ -233,11 +280,11 @@
             <p class="status" id="setupStatus"></p>
         </div>
 
-        <!-- チャットエリア（初期非表示） -->
+        <!-- チャットパネル -->
         <div id="chatPanel" class="chat-panel">
             <div class="chat-messages" id="chatMessages">
                 <div class="message assistant">
-                    👋 こんにちは！APIキーが有効になりました。何でも質問してください。
+                    👋 こんにちは！OpenRouter経由で選択したモデルと会話できます。
                 </div>
             </div>
             <div class="chat-input-area">
@@ -255,54 +302,75 @@
 
     <script>
         (function() {
-            // DOM elements
+            // ---- 定数 ----
+            const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+            const STORAGE_KEY = 'openrouter_api_key';
+            const STORAGE_MODEL = 'openrouter_model';
+            const SITE_NAME = 'AI Chat App';
+            const SITE_URL = window.location.origin || 'http://localhost';
+
+            // ---- DOM ----
             const setupPanel = document.getElementById('setupPanel');
             const chatPanel = document.getElementById('chatPanel');
             const apiKeyInput = document.getElementById('apiKeyInput');
             const activateBtn = document.getElementById('activateBtn');
             const setupStatus = document.getElementById('setupStatus');
+            const modelSelect = document.getElementById('modelSelect');
             const chatMessages = document.getElementById('chatMessages');
             const userInput = document.getElementById('userInput');
             const sendBtn = document.getElementById('sendBtn');
             const resetKeyBtn = document.getElementById('resetKeyBtn');
             const chatStatus = document.getElementById('chatStatus');
 
-            // State
-            let apiKey = localStorage.getItem('openai_api_key') || '';
-            let isWaitingForResponse = false;
+            // ---- 状態 ----
+            let apiKey = localStorage.getItem(STORAGE_KEY) || '';
+            let selectedModel = localStorage.getItem(STORAGE_MODEL) || 'meta-llama/llama-3.2-3b-instruct:free';
+            let isWaiting = false;
 
-            // Initialize: if key exists, go directly to chat
+            // モデル選択を復元
             if (apiKey) {
+                modelSelect.value = selectedModel;
                 showChatPanel();
             }
 
-            // Event listeners
+            // ---- イベント ----
             activateBtn.addEventListener('click', handleActivate);
             apiKeyInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') handleActivate();
             });
-            sendBtn.addEventListener('click', handleSendMessage);
+            modelSelect.addEventListener('change', () => {
+                if (apiKey) {
+                    // チャット画面でもモデル変更を反映（すでにアクティブなら保存）
+                    selectedModel = modelSelect.value;
+                    localStorage.setItem(STORAGE_MODEL, selectedModel);
+                }
+            });
+            sendBtn.addEventListener('click', handleSend);
             userInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    handleSendMessage();
+                    handleSend();
                 }
             });
             resetKeyBtn.addEventListener('click', handleResetKey);
 
+            // ---- 関数 ----
             function handleActivate() {
                 const key = apiKeyInput.value.trim();
                 if (!key) {
                     setupStatus.textContent = '⚠️ APIキーを入力してください。';
                     return;
                 }
-                if (!key.startsWith('sk-')) {
-                    setupStatus.textContent = '⚠️ 有効なOpenAI APIキーではありません（sk- で始まる必要があります）。';
+                // OpenRouterキーは通常 sk-or-v1- で始まる
+                if (!key.startsWith('sk-or-')) {
+                    setupStatus.textContent = '⚠️ 正しいOpenRouterキーではありません（sk-or-v1-...）。';
                     return;
                 }
-                // Save key
+                // 保存
                 apiKey = key;
-                localStorage.setItem('openai_api_key', apiKey);
+                localStorage.setItem(STORAGE_KEY, apiKey);
+                selectedModel = modelSelect.value;
+                localStorage.setItem(STORAGE_MODEL, selectedModel);
                 apiKeyInput.value = '';
                 setupStatus.textContent = '';
                 showChatPanel();
@@ -311,77 +379,83 @@
             function showChatPanel() {
                 setupPanel.classList.add('hidden');
                 chatPanel.classList.add('active');
-                // Ensure welcome message is shown if chat is empty
                 if (chatMessages.children.length === 0) {
-                    addMessage('assistant', '👋 こんにちは！APIキーが有効になりました。何でも質問してください。');
+                    addMessage('assistant', '👋 こんにちは！OpenRouter経由で選択したモデルと会話できます。');
                 }
                 userInput.focus();
             }
 
             function handleResetKey() {
-                if (isWaitingForResponse) {
-                    chatStatus.textContent = '応答待ちのためキーを解除できません。しばらくお待ちください。';
+                if (isWaiting) {
+                    chatStatus.textContent = '応答待ちのためキーを解除できません。';
                     return;
                 }
-                if (confirm('APIキーを削除し、入力画面に戻りますか？')) {
-                    localStorage.removeItem('openai_api_key');
+                if (confirm('APIキーとチャット履歴を消去しますか？')) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem(STORAGE_MODEL);
                     apiKey = '';
                     chatMessages.innerHTML = '';
                     chatPanel.classList.remove('active');
                     setupPanel.classList.remove('hidden');
-                    setupStatus.textContent = '';
+                    setupStatus.textContent = 'キーを解除しました。';
                 }
             }
 
-            async function handleSendMessage() {
+            async function handleSend() {
                 const message = userInput.value.trim();
-                if (!message || isWaitingForResponse) return;
+                if (!message || isWaiting) return;
                 if (!apiKey) {
-                    chatStatus.textContent = 'APIキーが設定されていません。再読み込みしてください。';
+                    chatStatus.textContent = 'APIキーがありません。再読み込みしてください。';
                     return;
                 }
 
-                // Add user message
+                // ユーザーメッセージ表示
                 addMessage('user', message);
                 userInput.value = '';
                 chatStatus.textContent = '考え中...';
-                isWaitingForResponse = true;
+                isWaiting = true;
                 sendBtn.disabled = true;
 
                 try {
-                    const response = await callOpenAI(apiKey, message);
+                    // モデルを最新に（設定画面から来た場合はすでに反映済み）
+                    const model = modelSelect.value;
+                    const response = await callOpenRouter(apiKey, model, message);
                     addMessage('assistant', response);
                     chatStatus.textContent = '';
-                } catch (error) {
-                    console.error(error);
-                    addMessage('error', `⚠️ エラー: ${error.message}`);
-                    chatStatus.textContent = 'エラーが発生しました。APIキーやネットワークを確認してください。';
+                } catch (err) {
+                    console.error(err);
+                    addMessage('error', `⚠️ エラー: ${err.message}`);
+                    chatStatus.textContent = 'エラーが発生しました。キーやモデル、利用制限を確認してください。';
                 } finally {
-                    isWaitingForResponse = false;
+                    isWaiting = false;
                     sendBtn.disabled = false;
                     userInput.focus();
                 }
             }
 
-            async function callOpenAI(key, userMessage) {
-                const url = 'https://api.openai.com/v1/chat/completions';
-                const payload = {
-                    model: 'gpt-3.5-turbo', // 低コスト＆高速。必要に応じて変更可
+            async function callOpenRouter(key, model, userMessage) {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${key}`,
+                    // OpenRouter推奨ヘッダー（任意だが送信するとランキング表示などで有利）
+                    'HTTP-Referer': SITE_URL,
+                    'X-Title': SITE_NAME,
+                };
+
+                const body = JSON.stringify({
+                    model: model,
                     messages: [
-                        { role: 'system', content: 'あなたは親切なアシスタントです。日本語で簡潔に回答してください。' },
+                        { role: 'system', content: 'あなたは役立つアシスタントです。日本語で丁寧に回答してください。' },
                         { role: 'user', content: userMessage }
                     ],
                     temperature: 0.7,
-                    max_tokens: 1000
-                };
+                    max_tokens: 1000,
+                });
 
-                const res = await fetch(url, {
+                const res = await fetch(OPENROUTER_API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${key}`
-                    },
-                    body: JSON.stringify(payload)
+                    headers: headers,
+                    body: body,
                 });
 
                 if (!res.ok) {
@@ -391,7 +465,12 @@
                 }
 
                 const data = await res.json();
-                return data.choices[0].message.content.trim();
+                // OpenRouterのレスポンス形式はOpenAI互換
+                if (data.choices && data.choices[0]?.message?.content) {
+                    return data.choices[0].message.content.trim();
+                } else {
+                    throw new Error('予期しないレスポンス形式です');
+                }
             }
 
             function addMessage(role, content) {
